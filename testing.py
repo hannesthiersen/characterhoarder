@@ -8,7 +8,7 @@ def buildFighter():
     # TODO: write a scipt to choose ability scores
 
     # Set ability scores
-    myFighter.setBaseAbilityScores({
+    mycharacter.setBaseAbilityScores({
         "strength": 15,
         "dexterity": 13,
         "constitution": 14,
@@ -44,15 +44,27 @@ def buildFighter():
     # Set class attributes
     mycharacter.setHitDie(10)
     # TODO: add proficiencies
+    mycharacter.addProficiencies(**{
+        "armor": [ "all", "shield" ],
+        "weapon": [ "simple", "martial" ],
+        "skills": [ "survival", "insight" ],
+        "saves": [ "strength", "constitution" ],
+        })
 
     # Choose background
     # TODO: write a scipt to choose background
-    print("Class: Soldier")
+    print("Background: Soldier")
+    print()
 
     # Set background attributes
     # TODO: add proficiencies
+    mycharacter.addProficiencies(**{
+        "tools": [ "dice set", "vehicle(land)" ],
+        "skills": [ "athletics", "intimidation" ],
+        })
 
     # Set level(s)
+    mycharacter.setLevel(1)
 
     # Add level 1 features
     mycharacter.addFeatures(
@@ -66,11 +78,58 @@ def buildFighter():
     # TODO: add additional levels' features
 
     # Update character to implement traits and features
+    mycharacter.implementProficiencies()
+
+    #--------------------------------------------------------------------------
+    # Show character stats
+    #--------------------------------------------------------------------------
+    # Ability scores
+    print("Ability Scores:")
+    fmod = lambda mod: f"+{mod}" if not mod<0 else str(mod)
+    abscores = mycharacter.getAbilityScores()
+    abmods = mycharacter.getAbilityModifiers()
+    for ability, score in abscores.items():
+        print("\t{} [{}] {}".format(
+            fmod(abmods[ability]),
+            str(abscores[ability]).rjust(2),
+            ability[:3].upper()))
+    print()
 
 
-def main():
+    #--------------------------------------------------------------------------
+    # Skill scores
+    profs = mycharacter.getProficiencies()
+    profstar = lambda skill: \
+        f"*{skill}" if skill in profs["skills"] else skill
+    print("Skills:")
+    skillscores = mycharacter.getSkills()
+    for skill, score in skillscores.items():
+        print("\t{} {}".format(fmod(score), profstar(skill)))
+    print()
+
+    #--------------------------------------------------------------------------
+    # All proficiencies
+    print("All Proficiencies:")
+    for ptype, proflist in profs.items():
+        print(f"{ptype}: ", *proflist)
+    print()
+
+    #--------------------------------------------------------------------------
+    print("Traits(racial)")
+    for trait in mycharacter.getTraits():
+        print(trait)
+    print()
+
+
+    print("Features")
+    for feature in mycharacter.getFeatures():
+        print(feature)
+
+
+
+#------------------------------------------------------------------------------
+def simpleCharacter():
     mycharacter = Character()
-
     mycharacter.setBaseAbilityScores({
         "strength": 10,
         "dexterity": 20,
@@ -86,6 +145,9 @@ def main():
     print(mycharacter.getAbilityScores())
     print(mycharacter.getAbilityModifiers())
     print(mycharacter.getSkills())
+
+def main():
+    buildFighter()
 
 
 if __name__ == "__main__":

@@ -1,14 +1,7 @@
-STR_SKILLS = [ "athletics" ]
-DEX_SKILLS = [ "acrobatics", "sleight of hand", "stealth", ]
-INT_SKILLS = [ "arcana", "history", "investigation", "nature", "religion", ]
-WIS_SKILLS = [
-        "animal handling",
-        "insight",
-        "medicine",
-        "perception",
-        "survival", ]
-CHA_SKILLS = [ "deception", "intimidation", "performance", "persuasion", ]
+from characterproficiencies import CharacterProficiencies
 
+from gameinfo import \
+        STR_SKILLS, DEX_SKILLS, INT_SKILLS, WIS_SKILLS, CHA_SKILLS
 
 #------------------------------------------------------------------------------
 class Character():
@@ -17,17 +10,14 @@ class Character():
 
     #--------------------------------------------------------------------------
     def __init__(self):
+        self.level = 1
         self.traits = []
         self.features = []
         self.inventory = []
-
-        #self.equiptArmor = None
-        #self.equiptWeapon = None
-        #self.equiptShield = None
-        #self.shieldDon = False
+        self.proficiencies = CharacterProficiencies()
 
     #--------------------------------------------------------------------------
-    def addAbilityScoreIncreases(increase):
+    def addAbilityScoreIncreases(self, increases):
         self.abilityScoreIncreases.append(increases)
 
     #--------------------------------------------------------------------------
@@ -64,7 +54,7 @@ class Character():
     #--------------------------------------------------------------------------
     def setLevel(self, level):
         self.level = level
-        self.proficiencyBonus = 2 + (self.level -1) // 4
+        self.proficiencyBonus = lambda: 2 + (self.level -1) // 4
 
     #--------------------------------------------------------------------------
     def setRace(self, race):
@@ -148,7 +138,7 @@ class Character():
     #--------------------------------------------------------------------------
     def initializeSpellCasting(self, ability):
         self.castingAbility = ability
-        profBonus = self.proficiencyBonus
+        profBonus = self.proficiencyBonus()
         abmod = self.getAbilityModifier(ability)
         self.spellDC = 8 + profBonus + abmod
         self.spellAttack = profBonus + abmod
@@ -156,26 +146,52 @@ class Character():
                 "cantrips": [],
                 1: [], }
 
+    #--------------------------------------------------------------------------
+    def addProficiencies(self, **proficiencies):
+        armor = proficiencies.get("armor", "")
+        if armor:
+            self.proficiencies.addArmors(*armor)
+
+        saves = proficiencies.get("saves", "")
+        if saves:
+            self.proficiencies.addSaves(*saves)
+
+        skills = proficiencies.get("skills", "")
+        if skills:
+            self.proficiencies.addSkills(*skills)
+
+        tools = proficiencies.get("tools", "")
+        if tools:
+            self.proficiencies.addTools(*tools)
+
+    #--------------------------------------------------------------------------
+    def addExpertise(self, *expertise):
+        self.proficiencies.addExpertise(expertise)
+
+    #--------------------------------------------------------------------------
+    def getProficiencies(self):
+        proficiencies = {}
+        proficiencies["armor"] = self.proficiencies.getArmors()
+        proficiencies["expertise"] = self.proficiencies.getExpertise()
+        proficiencies["saves"] = self.proficiencies.getSave()
+        proficiencies["skills"] = self.proficiencies.getSkills()
+        proficiencies["tools"] = self.proficiencies.getTools()
+        return proficiencies
+
+    #--------------------------------------------------------------------------
+    def implementProficiencies(self):
+        for skill in self.proficiencies.skills:
+            self.skills[skill].append(
+                    lambda: self.proficiencyBonus(),)
+
+    #--------------------------------------------------------------------------
+    def getTraits(self):
+        return self.traits
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    #--------------------------------------------------------------------------
+    def getFeatures(self):
+        return self.features
 
 
 
