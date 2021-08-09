@@ -1,5 +1,35 @@
 from character import Character
 
+class dummyCharacter():
+
+    def __init__(self):
+        self.ability = 14
+
+    def getAbilityModifier(self, ability):
+        return (self.ability - 10) // 2
+
+    def setAbilityScore(self, ability):
+        self.ability = ability
+
+
+def test_SkillStat():
+    """
+    Test basic operation of SkillStat class/objects
+    """
+    from concepts.skillstat import SkillStat
+
+    dummy = dummyCharacter()
+
+    skill = SkillStat(lambda: dummy.getAbilityModifier("strength"))
+    print("Skill value: {}".format(skill.getValue()))
+
+    dummy.setAbilityScore(20)
+
+    print("Skill value: {}".format(skill.getValue()))
+
+
+
+
 def buildFighter():
 
     mycharacter = Character()
@@ -147,7 +177,8 @@ def simpleCharacter():
     print(mycharacter.getSkills())
 
 def main():
-    buildFighter()
+    #buildFighter()
+    test_SkillStat()
 
 
 if __name__ == "__main__":
