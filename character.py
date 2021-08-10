@@ -10,7 +10,7 @@ class Character():
 
     #--------------------------------------------------------------------------
     def __init__(self):
-        self.level = 1
+        self.setLevel(1)
         self.traits = []
         self.features = []
         self.inventory = []
